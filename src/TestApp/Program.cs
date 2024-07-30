@@ -17,4 +17,8 @@ var client = host.Services.GetRequiredService<RDAPClient>();
 //await client.ResolveAsync("com", "google.com");
 //await client.ResolveAsync("org", "iana.org");
 //await client.ResolveAsync("arpa", "152.112.149.in-addr.arpa");
-await client.ResolveAsync("cloud", "klassetrivsel.cloud");
+//var response = await client.ResolveAsync("cloud", "klassetrivsel.cloud",new  CancellationTokenSource().Token);
+//var response = await client.ResolveAsync("com", "staytransparent.com", new CancellationTokenSource().Token);
+var response = await client.ResolveAsync("com", "scalemodellingcentral.com", new CancellationTokenSource().Token);
+
+String temp = response.Country;
