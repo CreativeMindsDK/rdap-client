@@ -6,8 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Reflection.Metadata;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +19,30 @@ namespace CreativeMinds.RDAP.Client {
 			this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
 		}
 
-		public async Task<RDAPResponse?> ResolveAsync(String tld, String domain, CancellationToken cancellationToken) {
+		public async Task<RDAPEntityResponse?> ResolveEntityAsync(String tld, String entity, CancellationToken cancellationToken) {
+			Activity? activity = Activity.Current;
+			activity?.AddEvent(new ActivityEvent("Trying to resolve an entity", tags: new ActivityTagsCollection([new KeyValuePair<String, Object?>("rdap.resolve.tld", tld), new KeyValuePair<String, Object?>("rdap.resolve.entity", entity)])));
+
+			DataNode? server = await this.GetServerAsync(tld, cancellationToken);
+			if (server == null) {
+				activity?.SetStatus(ActivityStatusCode.Error, "No server found for tld");
+				return null;
+			}
+
+			using var client = this.httpClientFactory.CreateClient();
+
+			using (HttpResponseMessage response = await client.GetAsync($"{server.Servers.First()}entity/{entity}", cancellationToken)) {
+				if (response.IsSuccessStatusCode == true) {
+					return RDAPEntityResponse.Parse(await response.Content.ReadAsStringAsync());
+				}
+				else {
+					// TODO: Handle 404 etc...!!
+					return null;
+				}
+			}
+		}
+
+		public async Task<RDAPDomainResponse?> ResolveDomainAsync(String tld, String domain, CancellationToken cancellationToken) {
 			Activity? activity = Activity.Current;
 			activity?.AddEvent(new ActivityEvent("Trying to resolve a domain", tags: new ActivityTagsCollection([new KeyValuePair<String, Object?>("rdap.resolve.tld", tld), new KeyValuePair<String, Object?>("rdap.resolve.domain", domain)])));
 
@@ -35,7 +56,7 @@ namespace CreativeMinds.RDAP.Client {
 
 			using (HttpResponseMessage response = await client.GetAsync($"{server.Servers.First()}domain/{domain}", cancellationToken)) {
 				if (response.IsSuccessStatusCode == true) {
-					return JsonConvert.DeserializeObject<RDAPResponse>(await response.Content.ReadAsStringAsync());
+					return RDAPDomainResponse.Parse(await response.Content.ReadAsStringAsync());
 				}
 				else {
 					// TODO: Handle 404 etc...!!
