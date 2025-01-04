@@ -7,6 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CreativeMinds.RDAP.Client",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{F7C54918-229A-48B2-9DD8-0539AC878C08}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{25B92D46-0182-4454-907F-2E9BA73FDDF9}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\Publish NuGet.yml = ..\.github\workflows\Publish NuGet.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
