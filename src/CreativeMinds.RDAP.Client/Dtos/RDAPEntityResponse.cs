@@ -1,9 +1,6 @@
-﻿using CreativeMinds.RDAP.Client.Dtos.VCards;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CreativeMinds.RDAP.Client.Dtos {
 
@@ -15,57 +12,11 @@ namespace CreativeMinds.RDAP.Client.Dtos {
 		public String Handle { get; set; }
 
 		private IList<RDAPVCard> vcard = new List<RDAPVCard>();
-		public IEnumerable<RDAPVCard> VCard { get { return this.vcard; } }
+		public IEnumerable<RDAPVCard> VCard { get; internal set; }
 
 		// vcardArray
 		[JsonProperty("vcardArray")]
-		public Object? VCardArrayRaw {
-			get { return null; }
-			set {
-				var temp = value as JArray;
-
-				var child = temp?.Skip(1).FirstOrDefault();
-
-				var array = child.Children<JToken>();
-
-				foreach (var a in array) {
-
-					var type = a.First().Value<String>();
-
-					switch (type) {
-						case "version":
-							this.vcard.Add(new VersionVCard { Value = a.Last().Value<String>(), Type = type });
-							break;
-						case "fn":
-							this.vcard.Add(new FullNameVCard { Value = a.Last().Value<String>(), Type = type });
-							break;
-						case "adr":
-
-
-							break;
-						case "email":
-							break;
-						case "contact-uri":
-							break;
-						case "kind":
-							break;
-						case "lang":
-							break;
-						case "org":
-							this.vcard.Add(new OrganisationVCard { Value = a.Last().Value<String>(), Type = type });
-							break;
-						case "role":
-							break;
-						case "tel":
-							break;
-						case "title":
-							break;
-						case "url":
-							break;
-					}
-				}
-			}
-		}
+		public Object? VCardArrayRaw { get; set; }
 
 		[JsonProperty("roles")]
 		public String[] Roles { get; set; }
@@ -122,12 +73,5 @@ namespace CreativeMinds.RDAP.Client.Dtos {
 
 		//[JsonProperty("country")]
 		//public String Country { get; set; }
-
-		public static RDAPEntityResponse? Parse(String data) {
-
-			// TODO:
-
-			return JsonConvert.DeserializeObject<RDAPEntityResponse>(data);
-		}
 	}
 }

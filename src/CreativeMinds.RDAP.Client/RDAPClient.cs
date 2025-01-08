@@ -1,5 +1,4 @@
 ﻿using CreativeMinds.RDAP.Client.Dtos;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,9 +13,11 @@ namespace CreativeMinds.RDAP.Client {
 	public class RDAPClient : IRDAPClient {
 		private TldData? data = null;
 		private readonly IHttpClientFactory httpClientFactory;
+		private readonly RDAPEntityDeserialiser entityDeserialiser;
 
-		public RDAPClient(IHttpClientFactory httpClientFactory) {
+		public RDAPClient(IHttpClientFactory httpClientFactory, RDAPEntityDeserialiser entityDeserialiser) {
 			this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+			this.entityDeserialiser = entityDeserialiser ?? throw new ArgumentNullException(nameof(entityDeserialiser));
 		}
 
 		public async Task<RDAPEntityResponse?> ResolveEntityAsync(String tld, String entity, CancellationToken cancellationToken) {
@@ -33,7 +34,7 @@ namespace CreativeMinds.RDAP.Client {
 
 			using (HttpResponseMessage response = await client.GetAsync($"{server.Servers.First()}entity/{entity}", cancellationToken)) {
 				if (response.IsSuccessStatusCode == true) {
-					return RDAPEntityResponse.Parse(await response.Content.ReadAsStringAsync());
+					return await this.entityDeserialiser.ParseAsync(await response.Content.ReadAsStringAsync(), cancellationToken);
 				}
 				else {
 					// TODO: Handle 404 etc...!!
