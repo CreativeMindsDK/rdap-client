@@ -36,7 +36,11 @@ namespace CreativeMinds.RDAP.Client.Helpers {
 					}
 				}
 				else {
-					if (lines.Count() == 4) {
+					if (lines.Count() == 3) {
+						output.City = lines.First();
+						output.PostalCode = lines.Skip(1).First();
+					}
+					else if (lines.Count() == 4) {
 						output.Address1 = lines.First();
 						output.City = lines.Skip(1).First();
 						output.PostalCode = lines.Skip(2).First();
